@@ -42,7 +42,10 @@ def test_email_client():
 ```
 
 ## Limitations
-- Not thread safe yet
+- Not thread safe
+- Circumvented by calling a bash script that calls back to python
+
+Will fix these things if this repo gets some stars.
 
 ## Local development
 
