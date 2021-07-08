@@ -14,15 +14,25 @@ def send_to_me_correct():
     send_email_to_client("me@my.company", "Hi")
 
 @trouble.expected(lambda func, args, kwargs: False)
-def send_to_me_incorrect():
+def send_to_me_incorrect_1():
     send_email_to_client("me@my.company", "Hi")
+
+@trouble.expected(expect_to_send_myself_email)
+def send_to_me_incorrect_2():
+    send_email_to_client("alice@wonder.land", "Hi")
 
 
 def test_dry_run():
     send_to_me_correct()
 
     try:
-        send_to_me_incorrect()
+        send_to_me_incorrect_1()
+        assert False
+    except trouble.PossibleTrouble as exc:
+        pass
+
+    try:
+        send_to_me_incorrect_2()
         assert False
     except trouble.PossibleTrouble as exc:
         pass
