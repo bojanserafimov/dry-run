@@ -3,40 +3,50 @@ import inspect
 
 
 @trouble.cause
-def send_email_to_client(destination, content):
-    """Function that maybe writes to s3."""
+def send_email(destination, content):
+    """Pretend this function sends email, which could cause trouble."""
+
 
 def expect_to_send_myself_email(cause, args, kwargs):
     destination = utils.get_arg(cause, args, "destination")
-    return cause == send_email_to_client and destination == "me@my.company"
+    return cause == send_email and destination == "me@my.company"
+
 
 @trouble.expected(expect_to_send_myself_email)
-def send_to_me_correct():
+def send_to_me():
     """Correctly send email to myself."""
-    send_email_to_client("me@my.company", "Hi")
+    send_email("me@my.company", "Hi")
+
 
 @trouble.expected(trouble.no_trouble)
-def send_to_me_incorrect_1():
-    """Send email without declaring it."""
-    send_email_to_client("me@my.company", "Hi")
+def send_to_me_without_declaring():
+    """Send email without declaring this function could send an email."""
+    send_email("me@my.company", "Hi")
+
 
 @trouble.expected(expect_to_send_myself_email)
-def send_to_me_incorrect_2():
+def send_to_alice_thinking_it_goes_to_me():
     """Declare sending email to myself, but actually send to someone else."""
-    send_email_to_client("alice@wonder.land", "Hi")
+    send_email("alice@wonder.land", "Hi")
+
+
+valid_functions = (
+    send_to_me,
+)
+
+invalid_functions = (
+    send_to_me_without_declaring,
+    send_to_alice_thinking_it_goes_to_me,
+)
 
 
 def test_dry_run():
-    send_to_me_correct()
+    for fn in valid_functions:
+        fn()
 
-    try:
-        send_to_me_incorrect_1()
-        assert False
-    except trouble.PossibleTrouble as exc:
-        pass
-
-    try:
-        send_to_me_incorrect_2()
-        assert False
-    except trouble.PossibleTrouble as exc:
-        pass
+    for fn in invalid_functions:
+        try:
+            fn()
+            assert False
+        except trouble.PossibleTrouble as exc:
+            pass

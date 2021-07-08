@@ -5,13 +5,8 @@ Currently single-threaded.
 TODO make it somewhat thread-safe. Approaches:
 i) Make STACK thread-local
 ii) Put STACK in the stack, find it with inspect module
+iii) Use lock file, or maybe etcd lock
 
-TODO add type hints and input validation
-
-TODO test that these decorators preserve function
-metadata and type signature.
-
-TODO set up github CI, test in multiple python versions
 """
 import inspect
 
