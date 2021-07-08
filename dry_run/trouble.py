@@ -14,25 +14,24 @@ metadata and type signature.
 TODO set up github CI, test in multiple python versions
 """
 
-
 class PossibleTrouble(Exception):
-    def __init__(self, trouble_token):
-        self.trouble_token = trouble_token
+    """Raise when function was not expected to be called."""
 
 STACK = []
 
-def could_cause(trouble_token):
-    def decorator(func):
-        def decorated(*args, **kwargs):
-            for safety_predicate in STACK:
-                if not safety_predicate(trouble_token):
-                    raise PossibleTrouble(trouble_token)
-            return func(*args, **kwargs)
-        return decorated
-    return decorator
+
+def cause(func):
+    token = object()
+    def decorated(*args, **kwargs):
+        for safe in STACK:
+            if not safe(token, args, kwargs):
+                raise PossibleTrouble()
+        return func(*args, **kwargs)
+    decorated.token = token
+    return decorated
 
 
-def could_only_cause(safety_predicate):
+def expected(safety_predicate):
     def decorator(func):
         def decorated(*args, **kwargs):
             STACK.append(safety_predicate)
@@ -42,12 +41,3 @@ def could_only_cause(safety_predicate):
                 assert STACK.pop() == safety_predicate
         return decorated
     return decorator
-
-
-nothing = lambda x: False
-
-def only(thing):
-    return lambda t : t == thing
-
-def one_of(things):
-    return lambda t : t in things
