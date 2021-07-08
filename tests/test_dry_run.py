@@ -23,14 +23,12 @@ def process_request(request):
     send_email_to_client("alice@wonder.land", "Hello")
 
 
-def test_1():
-    # rebuild_cache should be prevented from sending email
+def test_rebuild_cache_not_allowed_to_send_email():
     try:
         rebuild_cache()
         assert False
     except trouble.PossibleTrouble as exc:
         assert exc.trouble_token == send_email
 
-    # We might need to send an email while processing a
-    # request. Verify that it's allowed.
+def test_process_request_allowed_to_send_email():
     process_request({})
