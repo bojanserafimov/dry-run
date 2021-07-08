@@ -13,6 +13,7 @@ metadata and type signature.
 
 TODO set up github CI, test in multiple python versions
 """
+import inspect
 
 class PossibleTrouble(Exception):
     """Raise when function was not expected to be called."""
@@ -21,13 +22,12 @@ STACK = []
 
 
 def cause(func):
-    token = object()
     def decorated(*args, **kwargs):
         for safe in STACK:
-            if not safe(token, args, kwargs):
+            if not safe(decorated, args, kwargs):
                 raise PossibleTrouble()
         return func(*args, **kwargs)
-    decorated.token = token
+    decorated.__signature__ = inspect.signature(func)
     return decorated
 
 
@@ -39,5 +39,10 @@ def expected(safety_predicate):
                 return func(*args, **kwargs)
             finally:
                 assert STACK.pop() == safety_predicate
+        decorated.__signature__ = inspect.signature(func)
         return decorated
     return decorator
+
+
+def no_trouble(token, args, kwargs):
+    return False
