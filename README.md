@@ -42,8 +42,9 @@ def test_email_client():
 ```
 
 ## Limitations
-- Not thread safe
-- Circumvented by calling a bash script that calls back to python
+- (fixable) Not thread safe
+- (fixable) Circumvented by calling a bash script that calls back to python, which is a reasonable scenario
+- (unfixable) Easily circumvented with enough dedication. Assumes code is not malicious
 
 Will fix these things if this repo gets some stars.
 
